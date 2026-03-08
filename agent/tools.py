@@ -22,6 +22,7 @@ def safe_path_for_project(path: str) -> pathlib.Path:
 
 @tool
 def write_file(path: str, content: str) -> str:
+    """Write content to a file inside the generated project directory."""
     p = safe_path_for_project(path)
     p.parent.mkdir(parents=True, exist_ok=True)
     with open(p, "w", encoding="utf-8") as f:
@@ -31,6 +32,7 @@ def write_file(path: str, content: str) -> str:
 
 @tool
 def read_file(path: str) -> str:
+    """Read and return contents of a file from the generated project directory."""
     p = safe_path_for_project(path)
     if not p.exists() or not p.is_file():
         return ""
@@ -40,23 +42,28 @@ def read_file(path: str) -> str:
 
 @tool
 def get_current_directory() -> str:
+    """Return the root directory where generated project files are stored."""
     return str(GENERATED_ROOT)
 
 
 @tool
 def list_files(directory: str = ".") -> str:
+    """List all files recursively inside a directory in the generated project."""
     p = safe_path_for_project(directory)
     if not p.exists():
         return "No files found."
     if not p.is_dir():
         return f"ERROR: {p} is not a directory"
+
     files = [str(f.relative_to(GENERATED_ROOT)) for f in p.rglob("*") if f.is_file()]
     return "\n".join(files) if files else "No files found."
 
 
 @tool
 def run_cmd(cmd: str, cwd: str = None, timeout: int = 30) -> Tuple[int, str, str]:
+    """Execute a shell command inside the generated project directory."""
     cwd_dir = safe_path_for_project(cwd) if cwd else GENERATED_ROOT
+
     res = subprocess.run(
         cmd,
         shell=True,
@@ -65,9 +72,5 @@ def run_cmd(cmd: str, cwd: str = None, timeout: int = 30) -> Tuple[int, str, str
         text=True,
         timeout=timeout,
     )
+
     return res.returncode, res.stdout, res.stderr
-
-
-def init_project_root() -> str:
-    GENERATED_ROOT.mkdir(parents=True, exist_ok=True)
-    return str(GENERATED_ROOT)

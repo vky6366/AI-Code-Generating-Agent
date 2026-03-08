@@ -3,8 +3,8 @@ from langgraph.constants import END
 from langgraph.graph import StateGraph
 from langgraph.prebuilt import create_react_agent
 from langchain_openai import ChatOpenAI
-from .prompt import *
-from .structure import *
+from agent.prompt import *
+from agent.structure import *
 from agent.tools import write_file, read_file, get_current_directory, list_files
 
 load_dotenv()
